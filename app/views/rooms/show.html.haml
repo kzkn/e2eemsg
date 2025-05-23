@@ -13,14 +13,22 @@
 = turbo_frame_tag @room, src: room_messages_path(@room)
 
 -# TODO: clear form after submit
+%div text
 = form_with model: TextMessage.new, url: room_text_messages_path(@room) do |f|
   = f.text_area :body, required: true, autocomplete: 'off'
   = f.button '送信'
 
+%div image
 = form_with model: ImageMessage.new, url: room_image_messages_path(@room) do |f|
   = f.file_field :image, required: true
   = f.button '送信'
 
+%div video
+= form_with model: VideoMessage.new, url: room_video_messages_path(@room) do |f|
+  = f.file_field :video, required: true
+  = f.button '送信'
+
+%div stamp
 - current_user.owned_stamp_sets.order(:id).each do |stamp_set|
   %div
     %div= stamp_set.name
