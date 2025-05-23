@@ -6,6 +6,7 @@ class Message < ApplicationRecord
   delegated_type :sendable, types: %w[TextMessage]
   has_many :message_reads, dependent: :destroy
   has_many :reactions, dependent: :destroy
+  has_many :reply_messages, dependent: :nullify, foreign_key: "reply_to_id", inverse_of: :reply_to
 
   delegate :render_for, to: :sendable
 

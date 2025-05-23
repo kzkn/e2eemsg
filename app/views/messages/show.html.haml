@@ -21,3 +21,9 @@
           %emoji-picker{ data: { action: 'emoji-click->emoji-picker#pick' } }
         = form_with url: room_message_reactions_path(@room, @message), method: :post, data: { emoji_picker_target: 'form' } do |f|
           = f.hidden_field :emoji
+
+    %div
+      = form_with model: ReplyMessage.new, url: room_reply_messages_path do |f|
+        = f.hidden_field :reply_to_id, value: @message.id
+        = f.text_area :body, required: true
+        = f.button '返信'

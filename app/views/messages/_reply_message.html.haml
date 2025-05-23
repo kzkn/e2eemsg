@@ -1,0 +1,11 @@
+%div
+  %blockquote
+    - reply_to = reply_message.reply_to
+    %div
+      = reply_to.render_for(current_membership, self)
+    %div
+      sent by #{reply_to.from.name}
+  への返信
+
+  %div
+    = reply_message.body

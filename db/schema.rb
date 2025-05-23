@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_23_212340) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_23_212847) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -111,6 +111,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_212340) do
     t.index ["message_id", "from_id", "emoji_id"], name: "index_reactions_on_message_id_and_from_id_and_emoji_id", unique: true
   end
 
+  create_table "reply_messages", force: :cascade do |t|
+    t.integer "reply_to_id"
+    t.string "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reply_to_id"], name: "index_reply_messages_on_reply_to_id"
+  end
+
   create_table "rooms", force: :cascade do |t|
     t.string "joinable_type", null: false
     t.integer "joinable_id", null: false
@@ -191,6 +199,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_212340) do
   add_foreign_key "reactions", "emojis"
   add_foreign_key "reactions", "memberships", column: "from_id"
   add_foreign_key "reactions", "messages"
+  add_foreign_key "reply_messages", "messages", column: "reply_to_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "stamp_messages", "stamps"
   add_foreign_key "stamp_ownerships", "stamp_sets"
