@@ -6,10 +6,13 @@ class MessagesController < ApplicationController
   after_action :create_message_read, only: %i[show]
 
   def index
-    @messages = @room.messages.order(:id) # TODO: paging
+    @messages = @room.viewable_messages_for(current_membership).order(:id) # TODO: paging
   end
 
   def show
+    if current_user.block_by_self?(@message.from.user)
+      head :no_content
+    end
   end
 
   private

@@ -7,11 +7,7 @@ class OneToOneChat < ApplicationRecord
   after_create :create_memberships
 
   def display_name_for(user)
-    if smaller_user_id == user.id
-      larger_user.name
-    else
-      smaller_user.name
-    end
+    other_for(user).name
   end
 
   def read_count_text(message, reader)
@@ -22,6 +18,15 @@ class OneToOneChat < ApplicationRecord
       "既読"
     else
       ""
+    end
+  end
+
+  def viewable_messages_for(membership)
+    other = other_for(membership.user)
+    if membership.user.block_by_self?(other)
+      room.messages.where(from: membership)
+    else
+      room.messages
     end
   end
 
@@ -38,5 +43,13 @@ class OneToOneChat < ApplicationRecord
   def create_memberships
     smaller_user.memberships.create_or_find_by!(room:)
     larger_user.memberships.create_or_find_by!(room:)
+  end
+
+  def other_for(user)
+    if smaller_user_id == user.id
+      larger_user
+    else
+      smaller_user
+    end
   end
 end

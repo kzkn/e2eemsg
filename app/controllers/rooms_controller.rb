@@ -1,4 +1,6 @@
 class RoomsController < ApplicationController
+  include InRoomResource
+
   before_action :set_room, only: %i[show]
 
   def index
@@ -10,7 +12,7 @@ class RoomsController < ApplicationController
 
   private
 
-  def set_room
-    @room = current_user.rooms.find(params[:id])
+  def room_id
+    params[:id]
   end
 end

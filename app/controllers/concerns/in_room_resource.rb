@@ -8,7 +8,11 @@ module InRoomResource
   private
 
   def set_room
-    @room = current_user.rooms.find(params[:room_id])
+    @room = current_user.rooms.find(room_id)
+  end
+
+  def room_id
+    params[:room_id]
   end
 
   def current_membership
