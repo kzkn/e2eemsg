@@ -17,6 +17,10 @@
   = f.text_area :body, required: true, autocomplete: 'off'
   = f.button '送信'
 
+= form_with model: ImageMessage.new, url: room_image_messages_path(@room) do |f|
+  = f.file_field :image, required: true
+  = f.button '送信'
+
 - current_user.owned_stamp_sets.order(:id).each do |stamp_set|
   %div
     %div= stamp_set.name

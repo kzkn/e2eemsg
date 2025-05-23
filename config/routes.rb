@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     end
     resources :text_messages, only: %i[create]
     resources :stamp_messages, only: %i[create]
+    resources :image_messages, only: %i[create]
   end
 
   resources :users, only: %i[] do
