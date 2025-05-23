@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_23_084837) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_23_200127) do
+  create_table "emojis", force: :cascade do |t|
+    t.string "name", null: false
+    t.json "definition", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_emojis_on_name", unique: true
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "room_id", null: false
@@ -48,6 +56,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_084837) do
     t.datetime "updated_at", null: false
     t.index ["larger_user_id"], name: "index_one_to_one_chats_on_larger_user_id"
     t.index ["smaller_user_id", "larger_user_id"], name: "index_one_to_one_chats_on_smaller_user_id_and_larger_user_id", unique: true
+  end
+
+  create_table "reactions", force: :cascade do |t|
+    t.integer "message_id", null: false
+    t.integer "from_id", null: false
+    t.integer "emoji_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["emoji_id"], name: "index_reactions_on_emoji_id"
+    t.index ["from_id"], name: "index_reactions_on_from_id"
+    t.index ["message_id", "from_id", "emoji_id"], name: "index_reactions_on_message_id_and_from_id_and_emoji_id", unique: true
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -88,5 +107,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_084837) do
   add_foreign_key "messages", "rooms"
   add_foreign_key "one_to_one_chats", "users", column: "larger_user_id"
   add_foreign_key "one_to_one_chats", "users", column: "smaller_user_id"
+  add_foreign_key "reactions", "emojis"
+  add_foreign_key "reactions", "memberships", column: "from_id"
+  add_foreign_key "reactions", "messages"
   add_foreign_key "sessions", "users"
 end

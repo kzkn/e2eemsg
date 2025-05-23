@@ -9,9 +9,7 @@ class TextMessagesController < ApplicationController
     message.save!
 
     respond_to do |format|
-      format.turbo_stream do
-        # nop
-      end
+      format.turbo_stream
       format.html do
         redirect_to room_url(@room)
       end

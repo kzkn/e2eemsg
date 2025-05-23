@@ -1,8 +1,23 @@
 = turbo_frame_tag @message do
-  %div{ id: dom_id(@message) style: 'margin-bottom: 1rem' }
+  %div{ id: dom_id(@message), style: 'margin-bottom: 1rem' }
     %div
       = @message.render_for(current_membership)
     %div
       sent by #{@message.from.name}
     %div
       = @room.read_count_text(@message, current_membership)
+    %div
+      - reactions = @message.reactions.order(:id).group_by { _1.emoji }
+      - reactions.each do |emoji, reacts|
+        %span
+          = emoji.render
+          = ':'
+          = reacts.size
+    - if @message.from != current_membership
+      %div{ data: { controller: 'emoji-picker' } }
+        %button{ type: :button, data: { emoji_picker_target: 'button', action: 'emoji-picker#toggle' } }
+          reaction
+        .tooltip{ data: { emoji_picker_target: 'tooltip' } }
+          %emoji-picker{ data: { action: 'emoji-click->emoji-picker#pick' } }
+        = form_with url: room_message_reactions_path(@room, @message), method: :post, data: { emoji_picker_target: 'form' } do |f|
+          = f.hidden_field :emoji

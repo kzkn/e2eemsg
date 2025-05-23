@@ -5,6 +5,7 @@ class Message < ApplicationRecord
   belongs_to :from, class_name: "Membership", inverse_of: :sent_messages
   delegated_type :sendable, types: %w[TextMessage]
   has_many :message_reads, dependent: :destroy
+  has_many :reactions, dependent: :destroy
 
   delegate :render_for, to: :sendable
 
