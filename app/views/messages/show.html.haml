@@ -1,0 +1,8 @@
+= turbo_frame_tag @message do
+  %div{ id: dom_id(@message) style: 'margin-bottom: 1rem' }
+    %div
+      = @message.render_for(current_membership)
+    %div
+      sent by #{@message.from.name}
+    %div
+      = @room.read_count_text(@message, current_membership)

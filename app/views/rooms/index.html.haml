@@ -1,0 +1,3 @@
+- @rooms.each do |room|
+  %div
+    = link_to room.display_name_for(current_user), room_path(room)

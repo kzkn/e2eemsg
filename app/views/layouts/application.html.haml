@@ -1,0 +1,17 @@
+!!! html
+%html
+  %head
+    %title= content_for(:title) || "e2eemsg"
+    %meta{ name: "viewport", content: "width=device-width,initial-scale=1" }
+    = csrf_meta_tags
+    = csp_meta_tag
+    = yield :head
+    = stylesheet_link_tag :app, "data-turbo-track": "reload"
+    = javascript_importmap_tags
+
+  %body
+    %main
+      = yield
+    - if user_signed_in?
+      %div
+        = button_to 'ログアウト', session_path, method: :delete

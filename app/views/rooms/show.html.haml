@@ -1,0 +1,7 @@
+= turbo_stream_from @room
+= turbo_frame_tag @room, src: room_messages_path(@room)
+
+-# TODO: clear form after submit
+= form_with model: TextMessage.new, url: room_text_messages_path(@room) do |f|
+  = f.text_area :body, required: true, autocomplete: 'off'
+  = f.button '送信'

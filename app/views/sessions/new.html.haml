@@ -1,0 +1,8 @@
+= form_with url: session_path, method: :post do |f|
+  = f.email_field :email, placeholder: 'メールアドレス'
+  -# TODO: password から encrypted_password を埋める処理をかく
+  -# = f.password_field :password, placeholder: 'パスワード'
+  -# = f.hidden_field :encrypted_password
+  = f.password_field :encrypted_password, placeholder: 'パスワード'
+  -# TODO: サブミット前に password をクリアするように
+  = f.button 'ログイン'
