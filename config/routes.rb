@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       resources :reactions, only: %i[create]
     end
     resources :text_messages, only: %i[create]
+    resources :stamp_messages, only: %i[create]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

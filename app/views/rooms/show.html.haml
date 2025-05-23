@@ -5,3 +5,12 @@
 = form_with model: TextMessage.new, url: room_text_messages_path(@room) do |f|
   = f.text_area :body, required: true, autocomplete: 'off'
   = f.button '送信'
+
+- current_user.owned_stamp_sets.order(:id).each do |stamp_set|
+  %div
+    %div= stamp_set.name
+    - stamp_set.stamps.order(:id).each do |stamp|
+      = form_with model: StampMessage.new, url: room_stamp_messages_path(@room) do |f|
+        = f.hidden_field :stamp_id, value: stamp.id
+        = f.button do
+          = image_tag stamp.image, style: 'width:75px;height:auto'

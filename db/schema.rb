@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_23_201922) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_23_202209) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -112,6 +112,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_201922) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "stamp_messages", force: :cascade do |t|
+    t.integer "stamp_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stamp_id"], name: "index_stamp_messages_on_stamp_id"
+  end
+
+  create_table "stamp_ownerships", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "stamp_set_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stamp_set_id"], name: "index_stamp_ownerships_on_stamp_set_id"
+    t.index ["user_id", "stamp_set_id"], name: "index_stamp_ownerships_on_user_id_and_stamp_set_id", unique: true
+  end
+
+  create_table "stamp_sets", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_stamp_sets_on_name", unique: true
+  end
+
+  create_table "stamps", force: :cascade do |t|
+    t.integer "stamp_set_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stamp_set_id"], name: "index_stamps_on_stamp_set_id"
+  end
+
   create_table "text_messages", force: :cascade do |t|
     t.string "body", null: false
     t.datetime "created_at", null: false
@@ -141,4 +171,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_201922) do
   add_foreign_key "reactions", "memberships", column: "from_id"
   add_foreign_key "reactions", "messages"
   add_foreign_key "sessions", "users"
+  add_foreign_key "stamp_messages", "stamps"
+  add_foreign_key "stamp_ownerships", "stamp_sets"
+  add_foreign_key "stamp_ownerships", "users"
+  add_foreign_key "stamps", "stamp_sets"
 end
