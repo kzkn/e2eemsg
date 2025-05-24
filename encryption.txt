@@ -1,0 +1,23 @@
+# sign in flow
+client) input email & password
+client) generate master password by pbkdf2 and save in memory
+client) generate pubkey/secretkey and encrypt secret key by master password
+client) generate digest by password
+client) send email, encrypted_password, pubkey, encrypted_secret_key
+server) authenticate with email & encrypted_password
+server) create session
+server) create keypair
+
+# message send flow
+client) generate new encryption key
+client) encrypt message body with encryption key
+client) encrypt encryption key by pubkey of each receivers
+client) send encrypted_body, encrypted_encryption_key, keypair_id
+server) save as message_payload
+
+# message receive flow
+server) serving message_payload
+client) decrypt secret key by master password
+client) decrypt encryption key by secret key
+client) decrypt message body by encryption key
+client) show
