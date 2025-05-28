@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_23_214438) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_25_085806) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -65,6 +65,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_214438) do
   create_table "image_messages", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "key_pairs", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "public_key", null: false
+    t.string "encrypted_private_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_key_pairs_on_user_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -194,6 +203,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_23_214438) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "blocks", "users", column: "blockee_id"
   add_foreign_key "blocks", "users", column: "blocker_id"
+  add_foreign_key "key_pairs", "users"
   add_foreign_key "memberships", "rooms"
   add_foreign_key "memberships", "users"
   add_foreign_key "message_reads", "memberships"

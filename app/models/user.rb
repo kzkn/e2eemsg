@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :owned_stamp_sets, through: :stamp_ownerships, source: :stamp_set
   has_many :blocks_by_self, class_name: "Block", foreign_key: :blocker_id, inverse_of: :blocker, dependent: :destroy
   has_many :blocks_by_other, class_name: "Block", foreign_key: :blockee_id, inverse_of: :blockee, dependent: :destroy
+  has_many :key_pairs, dependent: :destroy
 
   def block_by_self?(other_user)
     blocks_by_self.find_by(blockee: other_user)
