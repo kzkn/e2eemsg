@@ -1,51 +1,4 @@
 // やりたいこと
-// キーペアを生成したい
-let keyPair = await window.crypto.subtle.generateKey(
-  {
-    name: "RSA-OAEP",
-    modulusLength: 4096,
-    publicExponent: new Uint8Array([1, 0, 1]),
-    hash: "SHA-256",
-  },
-  true,
-  ["encrypt", "decrypt"],
-);
-
-// キーペアの公開鍵をテキスト化したい
-function ab2str(buf) {
-  return String.fromCharCode.apply(null, new Uint8Array(buf));
-}
-
-async function exportCryptoKey(key) {
-  const exported = await window.crypto.subtle.exportKey("spki", key);
-  const exportedAsString = ab2str(exported);
-  const exportedAsBase64 = window.btoa(exportedAsString);
-  return `-----BEGIN PUBLIC KEY-----\n${exportedAsBase64}\n-----END PUBLIC KEY-----`;
-}
-
-let exportedPubKey = await exportCryptoKey(keyPair.publicKey)
-
-// キーペアの秘密鍵をマスターキーで暗号化したい
-
-async function exportPrivateCryptoKey(key) {
-  const exported = await window.crypto.subtle.exportKey("pkcs8", key);
-  const exportedAsString = ab2str(exported);
-  const exportedAsBase64 = window.btoa(exportedAsString);
-  return `-----BEGIN PRIVATE KEY-----\n${exportedAsBase64}\n-----END PRIVATE KEY-----`;
-}
-
-let exportedPrivateKey = await exportPrivateCryptoKey(keyPair.privateKey)
-
-// 暗号化した秘密鍵をテキスト化したい
-
-// テキスト化された暗号化された秘密鍵をマスターキーで復元したい
-// テキスト化された公開鍵を復元したい
-
-// 適当な文字列を共通鍵暗号の鍵として使いたい
-// 適当な文字列から作った共通鍵暗号の鍵でメッセージを暗号化したい
-// キーペアの公開鍵で共通鍵暗号の鍵を暗号化したい
-// キーペアの秘密鍵で暗号化された共通鍵暗号の鍵を復元したい
-
 // 入力されたパスワードからマスターキーを生成したい
 function getKeyMaterial(password) {
   const enc = new TextEncoder();
@@ -74,4 +27,141 @@ async function deriveMasterKey(password, salt) {
   )
 }
 
-let masterkey = await deriveMasterKey('aaaaaaaaaaaaa')
+var salt = window.crypto.getRandomValues(new Uint8Array(12))
+var masterkey = await deriveMasterKey('aaaaaaaaaaaaa', salt)
+
+
+// キーペアを生成したい
+var keyPair = await window.crypto.subtle.generateKey(
+  {
+    name: "RSA-OAEP",
+    modulusLength: 4096,
+    publicExponent: new Uint8Array([1, 0, 1]),
+    hash: "SHA-256",
+  },
+  true,
+  ["encrypt", "decrypt"],
+);
+
+// キーペアの公開鍵をテキスト化したい
+function ab2str(buf) {
+  return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+
+async function exportCryptoKey(key) {
+  const exported = await window.crypto.subtle.exportKey("spki", key);
+  const exportedAsString = ab2str(exported);
+  return window.btoa(exportedAsString);
+}
+
+var exportedPubKeyText = await exportCryptoKey(keyPair.publicKey)
+
+// キーペアの秘密鍵をマスターキーで暗号化したい
+
+async function exportPrivateCryptoKey(key) {
+  return await window.crypto.subtle.exportKey("pkcs8", key);
+}
+
+async function encryptData(key, data) {
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const cipher = await window.crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    data,
+  );
+  return { cipher, iv }
+}
+
+async function encryptText(key, text) {
+  const enc = new TextEncoder();
+  return await encryptData(key, enc.encode(text))
+}
+
+var exportedPrivateKey = await exportPrivateCryptoKey(keyPair.privateKey)
+var encryptedPrivateKey = await encryptData(masterkey, exportedPrivateKey)
+
+// 暗号化した秘密鍵をテキスト化したい
+var exportedEncryptedPrivateKey = { cipher: btoa(ab2str(encryptedPrivateKey.cipher)), iv: btoa(ab2str(encryptedPrivateKey.iv)) }
+
+// テキスト化された暗号化された秘密鍵をマスターキーで復元したい
+function str2ab(str) {
+  const buf = new ArrayBuffer(str.length);
+  const bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = str.length; i < strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+}
+
+async function decryptText(key, ivtext, ciphertext) {
+  const iv = str2ab(atob(ivtext))
+  const cipher = str2ab(atob(ciphertext))
+  // iv 値は暗号化に使用した値と同じ
+  return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, cipher);
+}
+
+var privateKeyRaw = await decryptText(masterkey, exportedEncryptedPrivateKey.iv, exportedEncryptedPrivateKey.cipher)
+
+// テキスト化された公開鍵を復元したい
+var pubkeyRaw = str2ab(atob(exportedPubKeyText))
+
+// 適当な文字列を共通鍵暗号の鍵として使いたい
+function generateKey() {
+  const rawkey = window.crypto.getRandomValues(new Uint8Array(16));
+  return window.crypto.subtle.importKey(
+    "raw",
+    rawkey,
+    "AES-GCM",
+    true,
+    ["encrypt", "decrypt"],
+  );
+}
+
+// 適当な文字列から作った共通鍵暗号の鍵でメッセージを暗号化したい
+var text = 'hogehoge'
+var key = await generateKey()
+var encryptedMsg = await encryptText(key, text)
+var exportedEncryptedMsg = {
+  iv: btoa(ab2str(encryptedMsg.iv)),
+  cipher: btoa(ab2str(encryptedMsg.cipher)),
+}
+
+// キーペアの公開鍵で共通鍵暗号の鍵を暗号化したい
+var exportedKey = await window.crypto.subtle.exportKey("raw", key);
+var pubkey = await crypto.subtle.importKey("spki", pubkeyRaw, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["encrypt"])
+
+async function encryptTextByPubkey(key, data) {
+  const cipher = await window.crypto.subtle.encrypt(
+    { name: "RSA-OAEP" },
+    key,
+    data,
+  );
+  return { cipher }
+}
+
+var encryptedKey = await encryptTextByPubkey(pubkey, exportedKey)
+var encryptedKeyText = btoa(ab2str(encryptedKey.cipher))
+
+// キーペアの秘密鍵で暗号化された共通鍵暗号の鍵を復元したい
+async function decryptTextByPrivateKey(key, cipherText) {
+  const plain = await window.crypto.subtle.decrypt(
+    { name: "RSA-OAEP" },
+    key,
+    str2ab(atob(cipherText)),
+  );
+  return plain
+}
+
+var privkey = await crypto.subtle.importKey("pkcs8", privateKeyRaw, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["decrypt"])
+var decryptedKey = await decryptTextByPrivateKey(privkey, encryptedKeyText)
+var importedKey = await window.crypto.subtle.importKey(
+  "raw",
+  decryptedKey,
+  "AES-GCM",
+  true,
+  ["encrypt", "decrypt"],
+);
+
+// 復元した共通鍵で暗号化されたメッセージを復元したい
+var decryptedMsg = await decryptText(importedKey, exportedEncryptedMsg.iv, exportedEncryptedMsg.cipher)
+var decryptedMsgText = ab2str(decryptedMsg)
