@@ -16,6 +16,17 @@ class SessionsController < ApplicationController
     end
   end
 
+  def edit
+  end
+
+  def update
+    if current_user.encrypted_password == params[:encrypted_password]
+      redirect_to root_url, notice: "再認証しました"
+    else
+      render :edit, status: :unprocessable_content
+    end
+  end
+
   def destroy
     session_id = session.delete(:current_session_id)
     Session.find_by(id: session_id)&.destroy

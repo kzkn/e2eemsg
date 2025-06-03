@@ -4,7 +4,7 @@ export class Session {
   }
 
   isInitialized() {
-    return !this.email || !!this.masterKey
+    return !!this.masterKey
   }
 
   async initialize(email, password) {

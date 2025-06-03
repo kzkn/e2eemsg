@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
   before_action :authenticate!
 
-  helper_method :current_user, :user_signed_in?
+  helper_method :current_user, :user_signed_in?, :skip_reauth!, :skip_reauth?
 
   private
 
@@ -20,5 +20,13 @@ class ApplicationController < ActionController::Base
 
   def user_signed_in?
     Current.session.present?
+  end
+
+  def skip_reauth!
+    @skip_reauth = true
+  end
+
+  def skip_reauth?
+    !!@skip_reauth || !user_signed_in?
   end
 end

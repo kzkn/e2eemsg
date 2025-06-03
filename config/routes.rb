@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   root to: "rooms#index"
-  resource :session, only: %i[new create destroy]
+  resource :session, only: %i[new create edit update destroy]
 
   resources :rooms, only: %i[index show] do
     resources :messages, only: %i[index show] do
