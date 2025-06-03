@@ -1,3 +1,132 @@
+class Session {
+  constructor(email) {
+    this.email = email
+    this.masterKey = null
+  }
+
+  isInitialized() {
+    return !!this.masterKey
+  }
+
+  async initialize(password) {
+    this.masterKey = await this.#generateMasterKey(password)
+  }
+
+  async #generateMasterKey(password) {
+    return deriveMasterKey(password, await this.#masterKeySalt())
+  }
+
+  #masterKeySalt() {
+    return sha256(str2ab(this.email))
+  }
+}
+
+class Node {
+  constructor(session, keyPair) {
+    this.session = session
+    this.keyPair = keyPair
+  }
+
+  async encrypt(data) {
+    const cipher = await window.crypto.subtle.encrypt(
+      { name: "RSA-OAEP" },
+      await this.publicKey(),
+      data,
+    );
+    return { cipher }
+  }
+
+  async publicKey() {
+    return await crypto.subtle.importKey(
+      "spki",
+      this.keyPair.publicKey,
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      ["encrypt"]
+    )
+  }
+
+  async privateKey() {
+    return await decryptText(
+      this.session.masterkey,
+      this.keyPair.encryptedPrivateKeyIv,
+      this.keyPair.encryptedPrivateKeyCipher,
+    )
+  }
+}
+
+class EncryptedMessage {
+  constructor(node, cipher, iv, encryptedKey) {
+    this.node = node
+    this.cipher = cipher
+    this.iv = iv
+    this.encryptedKey = encryptedKey
+  }
+
+  async decrypt() {
+    const key = this.#decryptKey()
+    const msg = await decryptText(
+      key,
+      str2ab(atob(this.iv)),
+      str2ab(atob(this.cipher))
+    )
+    return ab2str(msg)
+  }
+
+  #decryptKey() {
+    const exportedKey = await this.node.decrypt(this.encryptedKey)
+    return await window.crypto.subtle.importKey(
+      "raw",
+      exportedKey,
+      "AES-GCM",
+      true,
+      ["encrypt", "decrypt"],
+    )
+  }
+}
+
+class PlainMessage {
+  constructor(plainText) {
+    this.plainText = plainText
+  }
+  
+  encryptFor(node) {
+    const key = await generateKey()
+    const msg = await encryptText(key, this.plainText)
+    const exportedKey = await window.crypto.subtle.exportKey("raw", key)
+    const encryptedKey = await node.encrypt(exportedKey)
+    return new EncryptedMessage(
+      node,
+      btoa(ab2str(msg.cipher)),
+      btoa(ab2str(msg.iv)),
+      btoa(ab2str(encryptedKey))
+    )
+  }
+}
+
+class Messenger {
+  constructor(session, keyPair) {
+    this.session = session
+    this.me = new Node(session, keyPair)
+    this.others = []
+  }
+
+  async broadcast(messageText) {
+    const msg = new PlainMessage(messageText)
+    await Promise.all(this.others.map(node => this.#deliverTo(node, msg)))
+  }
+
+  #deliverTo(receiver, plainMessage) {
+    const encryptedMessage = await plainMessage.encryptFor(receiver)
+    // TODO: submit encryptedMessage
+  }
+
+  async receive(cipherText, ivText, encryptedKeyText) {
+    const msg = new Encryptedmessage(this.me, cipherText, ivText, encryptedKeyText)
+    return await msg.decrypt()
+  }
+}
+
 // やりたいこと
 // 入力されたパスワードからマスターキーを生成したい
 function getKeyMaterial(password) {
