@@ -16,6 +16,14 @@ export default class extends Controller {
 
     this.formTarget.email.value = email
     this.formTarget.encrypted_password.value = await this.session.initialize(email, password)
+
+    if (this.formTarget.public_key) {
+      const keyPair = await this.session.generateKeyPair()
+      this.formTarget.public_key.value = keyPair.publicKey
+      this.formTarget.encrypted_private_key.value = keyPair.encryptedPrivateKey
+      this.formTarget.encrypted_private_key_iv.value = keyPair.encryptedPrivateKeyIv
+    }
+
     this.formTarget.requestSubmit()
   }
 }

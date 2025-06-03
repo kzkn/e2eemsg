@@ -13,6 +13,28 @@ export class Session {
     return this.#encryptPasswordForAuthenticate(password)
   }
 
+  async generateKeyPair() {
+    const keyPair = await window.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      },
+      true,
+      ["encrypt", "decrypt"],
+    );
+
+    const publicKey = await exportPublicKey(keyPair.publicKey)
+    const privKey = await exportPrivateKey(keyPair.privateKey)
+    const encPrivKey = await encryptData(this.masterKey, privKey)
+    return {
+      publicKey: btoa(ab2str(publicKey)),
+      encryptedPrivateKey: btoa(ab2str(encPrivKey.cipher)),
+      encryptedPrivateKeyIv: btoa(ab2str(encPrivKey.iv)),
+    }
+  }
+
   async #generateMasterKey(password) {
     const salt = await this.#masterKeySalt()
     return await deriveMasterKey(password, salt)
@@ -76,4 +98,27 @@ async function deriveMasterKey(password, salt) {
     true,
     ["encrypt", "decrypt"],
   )
+}
+
+async function exportPublicKey(key) {
+  return await window.crypto.subtle.exportKey("spki", key)
+}
+
+async function exportPrivateKey(key) {
+  return await window.crypto.subtle.exportKey("pkcs8", key);
+}
+
+async function encryptData(key, data) {
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const cipher = await window.crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    data,
+  );
+  return { cipher, iv }
+}
+
+async function encryptText(key, text) {
+  const enc = new TextEncoder();
+  return await encryptData(key, enc.encode(text))
 }

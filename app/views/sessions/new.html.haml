@@ -7,3 +7,6 @@
   = form_with url: session_path, method: :post, data: { authenticate_target: 'form' } do |f|
     = f.hidden_field :email
     = f.hidden_field :encrypted_password
+    = f.hidden_field :public_key
+    = f.hidden_field :encrypted_private_key
+    = f.hidden_field :encrypted_private_key_iv

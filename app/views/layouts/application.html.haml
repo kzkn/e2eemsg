@@ -11,7 +11,7 @@
     -# TODO: importmap で管理したい
     %script{ type: "module", src: "https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js" }
   %body
-    %div{ data: { controller: skip_reauth? ? nil : 'reauth' } }
+    = render 'layouts/messaging_session'
     %main
       = yield
     - if user_signed_in?

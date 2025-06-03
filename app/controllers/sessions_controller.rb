@@ -8,6 +8,12 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email: params[:email], encrypted_password: params[:encrypted_password])
     if user
+      user.key_pairs.create!(
+        public_key: params[:public_key],
+        encrypted_private_key: params[:encrypted_private_key],
+        encrypted_private_key_iv: params[:encrypted_private_key_iv],
+      )
+
       new_session = Session.create!(user:)
       session[:current_session_id] = new_session.id
       redirect_to root_url, notice: "ログインしました"
