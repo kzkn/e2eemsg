@@ -13,4 +13,8 @@ class User < ApplicationRecord
   def block_by_self?(other_user)
     blocks_by_self.find_by(blockee: other_user)
   end
+
+  def latest_key_pair
+    key_pairs.order(:id).last
+  end
 end

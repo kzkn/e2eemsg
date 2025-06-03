@@ -1,5 +1,3 @@
 %div{ data: { controller: skip_reauth? ? nil : 'reauth' } }
-- if user_signed_in? && (key_pair = current_user.key_pairs.order(:id).last).present?
-  #js-key-pair{ data: { public_key: key_pair.public_key,
-                        encrypted_private_key: key_pair.encrypted_private_key,
-                        encrypted_private_key_iv: key_pair.encrypted_private_key_iv } }
+- if user_signed_in?
+  #js-key-pair{ data: key_pair_data_attributes(current_user.latest_key_pair) }

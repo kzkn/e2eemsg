@@ -1,4 +1,7 @@
 = turbo_stream_from @room
+
+%div
+  = link_to 'back to top', root_url
 - other_members = @room.memberships.without(current_membership)
 %div
   - other_members.each do |member|
@@ -14,9 +17,19 @@
 
 -# TODO: clear form after submit
 %div text
-= form_with model: TextMessage.new, url: room_text_messages_path(@room) do |f|
-  = f.text_area :body, required: true, autocomplete: 'off'
-  = f.button '送信'
+-# TODO: この部分の js 実装
+%div{ data: { controller: 'message-encryptor' } }
+  = form_with model: TextMessage.new, url: '#' do |f|
+    = f.text_area :body, required: true, autocomplete: 'off'
+    = f.button '送信'
+  = form_with model: TextMessageForm.new, url: room_text_messages_path(@room) do |f|
+    - other_members.each_with_index do |member, index|
+      - enc_msg = TextMessageForm::EncryptedMessage.new(key_pair_id: member.latest_key_pair.id)
+      = f.fields_for :encrypted_messages, enc_msg, index: do |ff|
+        %div{ data: { message_encryptor_target: 'cipher', public_key: ff.object.public_key } }
+          = ff.hidden_field :membership_id, value: member.id
+          = ff.hidden_field :key_pair_id, value: ff.object.key_pair_id
+          = ff.hidden_field :cipher
 
 %div image
 = form_with model: ImageMessage.new, url: room_image_messages_path(@room) do |f|

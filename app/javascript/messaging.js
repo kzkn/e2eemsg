@@ -10,7 +10,7 @@ export class Session {
   async initialize(email, password) {
     this.email = email
     this.masterKey = await this.#generateMasterKey(password)
-    return this.#encryptPasswordForAuthenticate(password)
+    return this.#encryptPasswordForAuthenticate(email, password)
   }
 
   async generateKeyPair() {
