@@ -19,6 +19,8 @@ gem "solid_cable"
 gem "bootsnap", require: false
 
 gem "haml-rails"
+gem "dartsass-rails"
+gem "bootstrap", "~> 5.3.3"
 
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 # gem "thruster", require: false
