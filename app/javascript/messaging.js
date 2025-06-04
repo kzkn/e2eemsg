@@ -1,10 +1,20 @@
 export class Session {
   constructor() {
     this.masterKey = null
+    this.nodes = new Map()
   }
 
   isInitialized() {
     return !!this.masterKey
+  }
+
+  obtainNode(id, keyPair) {
+    let node = this.nodes.get(id)
+    if (!node) {
+      node = new Node(this, keyPair)
+      this.nodes.set(id, node)
+    }
+    return node
   }
 
   async initialize(email, password) {
@@ -48,6 +58,89 @@ export class Session {
     const key = await deriveMasterKey(password, `${email}_auth`)
     const buf = await window.crypto.subtle.exportKey("raw", key)
     return btoa(ab2str(buf))
+  }
+}
+
+class Node {
+  constructor(session, keyPair) {
+    this.session = session
+    this.keyPair = keyPair
+  }
+
+  async encrypt(data) {
+    const cipher = await window.crypto.subtle.encrypt(
+      { name: "RSA-OAEP" },
+      await this.publicKey(),
+      data,
+    );
+    return { cipher }
+  }
+
+  async publicKey() {
+    return await crypto.subtle.importKey(
+      "spki",
+      str2ab(atob(this.keyPair.publicKey)),
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      ["encrypt"]
+    )
+  }
+
+  async privateKey() {
+    return await decryptText(
+      this.session.masterkey,
+      this.keyPair.encryptedPrivateKeyIv,
+      this.keyPair.encryptedPrivateKeyCipher,
+    )
+  }
+}
+
+export class PlainMessage {
+  constructor(plainText) {
+    this.plainText = plainText
+  }
+
+  async encryptFor(node) {
+    const key = await generateKey()
+    const msg = await encryptText(key, this.plainText)
+    const exportedKey = await window.crypto.subtle.exportKey("raw", key)
+    const encryptedKey = await node.encrypt(exportedKey)
+    return new EncryptedMessage(
+      node,
+      btoa(ab2str(msg.cipher)),
+      btoa(ab2str(msg.iv)),
+      btoa(ab2str(encryptedKey.cipher))
+    )
+  }
+}
+
+class EncryptedMessage {
+  constructor(node, cipher, iv, encryptedKey) {
+    this.node = node
+    this.cipher = cipher
+    this.iv = iv
+    this.encryptedKey = encryptedKey
+  }
+
+  async decrypt() {
+    const key = this.#decryptKey()
+    const msg = await decryptText(
+      key,
+      str2ab(atob(this.iv)),
+      str2ab(atob(this.cipher))
+    )
+    return ab2str(msg)
+  }
+
+  async #decryptKey() {
+    const exportedKey = await this.node.decrypt(this.encryptedKey)
+    return await window.crypto.subtle.importKey(
+      "raw",
+      exportedKey,
+      "AES-GCM",
+      true,
+      ["encrypt", "decrypt"],
+    )
   }
 }
 
@@ -121,4 +214,15 @@ async function encryptData(key, data) {
 async function encryptText(key, text) {
   const enc = new TextEncoder();
   return await encryptData(key, enc.encode(text))
+}
+
+async function generateKey() {
+  const rawkey = window.crypto.getRandomValues(new Uint8Array(16));
+  return await window.crypto.subtle.importKey(
+    "raw",
+    rawkey,
+    "AES-GCM",
+    true,
+    ["encrypt", "decrypt"],
+  );
 }

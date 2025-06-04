@@ -1,10 +1,14 @@
 %div
   %blockquote
     - reply_to = reply_message.reply_to
-    %div
-      = reply_to.render_for(current_membership, self)
-    %div
-      sent by #{reply_to.from.name}
+    - if reply_to
+      %div
+        = reply_to.render_for(current_membership, self)
+      %div
+        sent by #{reply_to.from.name}
+    - else
+      %div
+        削除されたメッセージ
   への返信
 
   %div

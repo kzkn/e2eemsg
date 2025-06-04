@@ -19,17 +19,19 @@
 %div text
 -# TODO: この部分の js 実装
 %div{ data: { controller: 'message-encryptor' } }
-  = form_with model: TextMessage.new, url: '#' do |f|
-    = f.text_area :body, required: true, autocomplete: 'off'
+  = form_with model: TextMessage.new, url: '#', data: { action: 'message-encryptor#encrypt' } do |f|
+    = f.text_area :body, required: true, autocomplete: 'off', data: { message_encryptor_target: 'plain' }
     = f.button '送信'
-  = form_with model: TextMessageForm.new, url: room_text_messages_path(@room) do |f|
-    - other_members.each_with_index do |member, index|
+  = form_with model: TextMessageForm.new, url: room_text_messages_path(@room), data: { message_encryptor_target: 'form' }  do |f|
+    - @room.memberships.each_with_index do |member, index|
       - enc_msg = TextMessageForm::EncryptedMessage.new(key_pair_id: member.latest_key_pair.id)
       = f.fields_for :encrypted_messages, enc_msg, index: do |ff|
-        %div{ data: { message_encryptor_target: 'cipher', public_key: ff.object.public_key } }
+        %div{ data: { message_encryptor_target: 'cipher', key_pair_id: ff.object.key_pair_id, public_key: ff.object.public_key } }
           = ff.hidden_field :membership_id, value: member.id
           = ff.hidden_field :key_pair_id, value: ff.object.key_pair_id
-          = ff.hidden_field :cipher
+          = ff.hidden_field :cipher, data: { name: 'cipher' }
+          = ff.hidden_field :iv, data: { name: 'iv' }
+          = ff.hidden_field :encrypted_key, data: { name: 'encrypted_key' }
 
 %div image
 = form_with model: ImageMessage.new, url: room_image_messages_path(@room) do |f|

@@ -4,9 +4,9 @@ class TextMessagesController < ApplicationController
   before_action :set_room
 
   def create
-    message = @room.messages.build(from: current_membership)
-    message.sendable = TextMessage.new(text_message_params)
-    message.save!
+    form = TextMessageForm.new(text_message_form_params)
+    form.message = @room.messages.build(from: current_membership)
+    form.save!
 
     respond_to do |format|
       format.turbo_stream
@@ -18,7 +18,9 @@ class TextMessagesController < ApplicationController
 
   private
 
-  def text_message_params
-    params.expect(text_message: %i[body])
+  def text_message_form_params
+    params.expect(text_message_form: [ encrypted_messages_attributes: [
+                                         %i[membership_id key_pair_id cipher iv encrypted_key]
+                                       ] ])
   end
 end

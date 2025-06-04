@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_03_083209) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_04_012244) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -46,6 +46,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_03_083209) do
     t.datetime "updated_at", null: false
     t.index ["blockee_id"], name: "index_blocks_on_blockee_id"
     t.index ["blocker_id", "blockee_id"], name: "index_blocks_on_blocker_id_and_blockee_id", unique: true
+  end
+
+  create_table "ciphers", force: :cascade do |t|
+    t.integer "key_pair_id", null: false
+    t.string "encryptable_type", null: false
+    t.integer "encryptable_id", null: false
+    t.string "cipher_body", null: false
+    t.string "iv", null: false
+    t.string "encrypted_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["encryptable_type", "encryptable_id"], name: "index_ciphers_on_encryptable"
+    t.index ["key_pair_id"], name: "index_ciphers_on_key_pair_id"
   end
 
   create_table "emojis", force: :cascade do |t|
@@ -204,6 +217,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_03_083209) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "blocks", "users", column: "blockee_id"
   add_foreign_key "blocks", "users", column: "blocker_id"
+  add_foreign_key "ciphers", "key_pairs"
   add_foreign_key "key_pairs", "users"
   add_foreign_key "memberships", "rooms"
   add_foreign_key "memberships", "users"
