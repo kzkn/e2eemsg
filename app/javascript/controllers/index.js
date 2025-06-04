@@ -7,6 +7,9 @@ import { application } from "./application"
 import AuthenticateController from "./authenticate_controller"
 application.register("authenticate", AuthenticateController)
 
+import ClearController from "./clear_controller"
+application.register("clear", ClearController)
+
 import EmojiPickerController from "./emoji_picker_controller"
 application.register("emoji-picker", EmojiPickerController)
 
