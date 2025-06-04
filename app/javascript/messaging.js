@@ -76,6 +76,15 @@ class Node {
     return { cipher }
   }
 
+  async decrypt(data) {
+    const plain = await window.crypto.subtle.decrypt(
+      { name: 'RSA-OAEP' },
+      await this.privateKey(),
+      data
+    )
+    return plain
+  }
+
   async publicKey() {
     return await crypto.subtle.importKey(
       "spki",
@@ -87,10 +96,17 @@ class Node {
   }
 
   async privateKey() {
-    return await decryptText(
-      this.session.masterkey,
+    const privateKeyRaw = await decryptText(
+      this.session.masterKey,
       this.keyPair.encryptedPrivateKeyIv,
-      this.keyPair.encryptedPrivateKeyCipher,
+      this.keyPair.encryptedPrivateKey,
+    )
+    return await crypto.subtle.importKey(
+      "pkcs8",
+      privateKeyRaw,
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      ["decrypt"]
     )
   }
 }
@@ -114,7 +130,7 @@ export class PlainMessage {
   }
 }
 
-class EncryptedMessage {
+export class EncryptedMessage {
   constructor(node, cipher, iv, encryptedKey) {
     this.node = node
     this.cipher = cipher
@@ -123,17 +139,17 @@ class EncryptedMessage {
   }
 
   async decrypt() {
-    const key = this.#decryptKey()
+    const key = await this.#decryptKey()
     const msg = await decryptText(
       key,
-      str2ab(atob(this.iv)),
-      str2ab(atob(this.cipher))
+      this.iv,
+      this.cipher
     )
     return ab2str(msg)
   }
 
   async #decryptKey() {
-    const exportedKey = await this.node.decrypt(this.encryptedKey)
+    const exportedKey = await this.node.decrypt(str2ab(atob(this.encryptedKey)))
     return await window.crypto.subtle.importKey(
       "raw",
       exportedKey,
@@ -214,6 +230,12 @@ async function encryptData(key, data) {
 async function encryptText(key, text) {
   const enc = new TextEncoder();
   return await encryptData(key, enc.encode(text))
+}
+
+async function decryptText(key, ivText, cipherText) {
+  const iv = str2ab(atob(ivText))
+  const cipher = str2ab(atob(cipherText))
+  return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, cipher);
 }
 
 async function generateKey() {

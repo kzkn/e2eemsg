@@ -7,7 +7,7 @@ class TextMessage < ApplicationRecord
   def render_for(membership, view_context)
     cipher = ciphers.joins(:key_pair).find_by(key_pairs: { user_id: membership.user_id })
     if cipher
-      cipher.cipher_body
+      view_context.render("messages/text_message", text_message: self, cipher:)
     else
       "not sent to you"
     end
