@@ -145,7 +145,7 @@ export class EncryptedMessage {
       this.iv,
       this.cipher
     )
-    return ab2str(msg)
+    return new TextDecoder().decode(msg)
   }
 
   async #decryptKey() {
