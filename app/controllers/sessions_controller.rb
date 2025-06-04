@@ -23,11 +23,13 @@ class SessionsController < ApplicationController
   end
 
   def edit
+    @back_to = params[:back_to]
   end
 
   def update
+    @back_to = params[:back_to]
     if current_user.encrypted_password == params[:encrypted_password]
-      redirect_to root_url, notice: "再認証しました"
+      redirect_to params[:back_to] || root_url, notice: "再認証しました"
     else
       render :edit, status: :unprocessable_content
     end

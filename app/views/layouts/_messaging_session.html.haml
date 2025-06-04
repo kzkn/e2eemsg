@@ -1,3 +1,3 @@
-%div{ data: { controller: skip_reauth? ? nil : 'reauth' } }
+%div{ data: { controller: require_master_key? ? 'reauth' : nil } }
 - if user_signed_in?
   #js-key-pair{ data: key_pair_data_attributes(current_user.latest_key_pair) }

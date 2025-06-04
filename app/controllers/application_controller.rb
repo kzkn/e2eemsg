@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
   before_action :authenticate!
 
-  helper_method :current_user, :user_signed_in?, :skip_reauth!, :skip_reauth?
+  helper_method :current_user, :user_signed_in?, :require_master_key!, :require_master_key?
 
   private
 
@@ -22,11 +22,11 @@ class ApplicationController < ActionController::Base
     Current.session.present?
   end
 
-  def skip_reauth!
-    @skip_reauth = true
+  def require_master_key!
+    @require_master_key = true
   end
 
-  def skip_reauth?
-    !!@skip_reauth || !user_signed_in?
+  def require_master_key?
+    !!@require_master_key
   end
 end

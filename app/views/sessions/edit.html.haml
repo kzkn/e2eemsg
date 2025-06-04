@@ -1,5 +1,3 @@
-- skip_reauth!
-
 %div{ data: { controller: 'authenticate' } }
   = form_with url: '#', method: :post, data: { action: 'authenticate#handleSubmit' } do |f|
     = f.hidden_field :email, value: current_user.email, data: { authenticate_target: 'email' }
@@ -7,5 +5,6 @@
     = f.button '再認証'
 
   = form_with url: session_path, method: :put, data: { authenticate_target: 'form' } do |f|
+    = f.hidden_field :back_to, value: @back_to
     = f.hidden_field :email
     = f.hidden_field :encrypted_password

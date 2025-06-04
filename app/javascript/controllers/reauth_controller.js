@@ -5,6 +5,6 @@ export default class extends Controller {
   connect() {
     const session = global.session()
     if (!session.isInitialized())
-      location.href = '/session/edit'
+      location.href = `/session/edit?back_to=${encodeURIComponent(location.pathname)}`
   }
 }
