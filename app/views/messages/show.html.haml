@@ -4,7 +4,7 @@
       = @message.render_for(current_membership, self)
     %div
       sent by #{@message.from.name}
-    %div
+    %div{ id: dom_id(@message, :reads) }
       = @room.read_count_text(@message, current_membership)
     = render 'messages/reactions', message: @message
     - if @message.from != current_membership
