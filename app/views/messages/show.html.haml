@@ -23,6 +23,7 @@
           = f.hidden_field :emoji
 
     %div
+      -# TODO: 返信メッセージも暗号化したい
       = form_with model: ReplyMessage.new, url: room_reply_messages_path do |f|
         = f.hidden_field :reply_to_id, value: @message.id
         = f.text_area :body, required: true
