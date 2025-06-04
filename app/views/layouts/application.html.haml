@@ -7,9 +7,9 @@
     = csp_meta_tag
     = yield :head
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
-    = javascript_importmap_tags
-    -# TODO: importmap で管理したい
+    -# TODO: package.json で管理したい
     %script{ type: "module", src: "https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js" }
+    = javascript_include_tag 'application', type: "module", "data-turbo-track": "reload"
   %body
     = render 'layouts/messaging_session'
     %main

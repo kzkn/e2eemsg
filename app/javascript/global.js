@@ -1,4 +1,4 @@
-import { Session } from "messaging"
+import { Session } from "./messaging"
 
 window.__Global = {}
 

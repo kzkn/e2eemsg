@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import * as global from 'global'
+import * as global from '../global'
 
 export default class extends Controller {
   connect() {

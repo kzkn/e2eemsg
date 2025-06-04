@@ -4,10 +4,13 @@ gem "rails", "~> 8.0.2"
 gem "propshaft"
 gem "sqlite3", ">= 2.1"
 gem "puma", ">= 5.0"
-gem "importmap-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "jbuilder"
+
+gem "dartsass-rails"
+gem "jsbundling-rails"
+gem "propshaft"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

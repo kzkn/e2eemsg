@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
-import * as global from 'global'
-import { EncryptedMessage } from 'messaging'
+import * as global from '../global'
+import { EncryptedMessage } from '../messaging'
 
 export default class extends Controller {
   static values = {
