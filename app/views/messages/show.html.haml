@@ -17,7 +17,7 @@
       %div{ data: { controller: 'emoji-picker' } }
         %button{ type: :button, data: { emoji_picker_target: 'button', action: 'emoji-picker#toggle' } }
           reaction
-        .tooltip{ data: { emoji_picker_target: 'tooltip' } }
+        .x-tooltip{ data: { emoji_picker_target: 'tooltip' } }
           %emoji-picker{ data: { action: 'emoji-click->emoji-picker#pick' } }
         = form_with url: room_message_reactions_path(@room, @message), method: :post, data: { emoji_picker_target: 'form' } do |f|
           = f.hidden_field :emoji

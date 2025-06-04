@@ -6,9 +6,7 @@
     = csrf_meta_tags
     = csp_meta_tag
     = yield :head
-    = stylesheet_link_tag :app, "data-turbo-track": "reload"
-    -# TODO: package.json で管理したい
-    %script{ type: "module", src: "https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js" }
+    = stylesheet_link_tag 'application', "data-turbo-track": "reload"
     = javascript_include_tag 'application', type: "module", "data-turbo-track": "reload"
   %body
     = render 'layouts/messaging_session'
