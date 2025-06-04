@@ -7,7 +7,7 @@ class ReactionsController < ApplicationController
   def create
     emoji_picker_json = JSON.parse(params[:emoji])
     emoji = Emoji.retrieve_by_json(emoji_picker_json)
-    Reaction.create_or_find_by!(message: @message, from: current_membership, emoji:)
+    Reaction.toggle!(message: @message, from: current_membership, emoji:)
 
     respond_to do |format|
       format.turbo_stream
