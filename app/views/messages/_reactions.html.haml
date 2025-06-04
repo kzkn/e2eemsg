@@ -1,0 +1,7 @@
+%div{ id: dom_id(message, :reactions) }
+  - reactions = message.reactions.order(:id).group_by { _1.emoji }
+  - reactions.each do |emoji, reacts|
+    %span
+      = emoji.render
+      = ':'
+      = reacts.size

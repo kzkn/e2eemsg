@@ -1,9 +1,17 @@
 class Reaction < ApplicationRecord
+  include ActionView::RecordIdentifier
+
   belongs_to :message
   belongs_to :from, class_name: "Membership", inverse_of: :sent_reactions
   belongs_to :emoji
 
-  # TODO: stream でリアルタイムに画面に反映したい
+  after_commit :broadcast_replace
+
+  private
+
+  def broadcast_replace
+    broadcast_replace_to message.room, target: dom_id(message, :reactions), partial: "messages/reactions", locals: { message: }
+  end
 
   class << self
     def toggle!(message:, from:, emoji:)

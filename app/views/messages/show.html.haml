@@ -6,13 +6,7 @@
       sent by #{@message.from.name}
     %div
       = @room.read_count_text(@message, current_membership)
-    %div
-      - reactions = @message.reactions.order(:id).group_by { _1.emoji }
-      - reactions.each do |emoji, reacts|
-        %span
-          = emoji.render
-          = ':'
-          = reacts.size
+    = render 'messages/reactions', message: @message
     - if @message.from != current_membership
       %div{ data: { controller: 'emoji-picker' } }
         %button{ type: :button, data: { emoji_picker_target: 'button', action: 'emoji-picker#toggle' } }
