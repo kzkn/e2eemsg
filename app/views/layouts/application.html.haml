@@ -10,8 +10,6 @@
     = javascript_include_tag 'application', type: "module", "data-turbo-track": "reload"
   %body
     = render 'layouts/messaging_session'
-    %main
-      = yield
-    - if user_signed_in?
-      %div
-        = button_to 'ログアウト', session_path, method: :delete
+    %main.d-flex.flex-nowrap
+      = render 'layouts/sidebar'
+      .p-3.w-100= yield

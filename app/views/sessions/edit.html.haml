@@ -1,10 +1,17 @@
-%div{ data: { controller: 'authenticate' } }
-  = form_with url: '#', method: :post, data: { action: 'authenticate#handleSubmit' } do |f|
-    = f.hidden_field :email, value: current_user.email, data: { authenticate_target: 'email' }
-    = f.password_field :password, placeholder: 'パスワード', data: { authenticate_target: 'password' }
-    = f.button '再認証'
-
-  = form_with url: session_path, method: :put, data: { authenticate_target: 'form' } do |f|
-    = f.hidden_field :back_to, value: @back_to
-    = f.hidden_field :email
-    = f.hidden_field :encrypted_password
+.container
+  %h1.fs-1
+    再認証
+  .text-secondary
+    先に進むにはパスワードの再入力が必要です。
+  %hr
+  %div{ data: { controller: 'authenticate' } }
+    = form_with url: '#', method: :post, data: { action: 'authenticate#handleSubmit' } do |f|
+      = f.hidden_field :email, value: current_user.email, data: { authenticate_target: 'email' }
+      .mb-3
+        = f.password_field :password, placeholder: 'パスワード', data: { authenticate_target: 'password' }, class: 'form-control'
+      = f.button '再認証', class: 'btn btn-primary'
+  
+    = form_with url: session_path, method: :put, data: { authenticate_target: 'form' } do |f|
+      = f.hidden_field :back_to, value: @back_to
+      = f.hidden_field :email
+      = f.hidden_field :encrypted_password

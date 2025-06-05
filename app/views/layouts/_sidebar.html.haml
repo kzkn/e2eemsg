@@ -1,0 +1,16 @@
+.d-flex.flex-column.flex-shrink-0.p-3.text-bg-dark{ style: 'width: 280px' }
+  = link_to 'E2EE Msg', root_path, class: 'd-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none fs-4'
+  %hr
+  - if user_signed_in?
+    %ul.nav.nav-pills.flex-column.mb-auto
+      - sidebar_items.each do |item|
+        %li.nav-item
+          - active = item[:name] == active_sidebar_item
+          = link_to item[:label], item[:href], class: class_names('nav-link', active:, 'text-white': !active)
+    %hr
+    %div.dropdown
+      = link_to 'javascript:void(0)', class: 'text-white text-decoration-none dropdown-toggle', data: { bs_toggle: 'dropdown' } do
+        = current_user.name
+      %ul.dropdown-menu.dropdown-menu-drak.text-small.shadow
+        %li
+          = button_to 'ログアウト', session_path, method: :delete, class: 'dropdown-item'
