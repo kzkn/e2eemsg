@@ -2,8 +2,8 @@ class UsersController < ApplicationController
   before_action :set_user, only: %i[show]
 
   def index
-    last_id = params[:last_id]
-    @users = User.without(current_user).order(:id).then { last_id.present? ? _1.where("id > ?", last_id) : _1 }
+    @last_id = params[:last_id]
+    @users = User.without(current_user).order(:id).limit(50).then { @last_id.present? ? _1.where("id > ?", @last_id) : _1 }
   end
 
   def show

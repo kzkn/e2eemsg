@@ -2,6 +2,12 @@
 
 .container
   %h1.fs-4 Users
-  .bg-white.rounded.p-5.mt-3.vstack.gap-2
-    - @users.each do |user|
-      = link_to user.name, user_path(user)
+  .bg-white.rounded.p-5.mt-3
+    = turbo_frame_tag "users_#{@last_id}" do
+      - @users.each do |user|
+        .vstack.gap-2
+          = link_to user.name, user_path(user)
+
+      - next_last_id = @users.last&.id
+      - if next_last_id && User.exists?(['id > ?', next_last_id])
+        = turbo_frame_tag "users_#{next_last_id}", src: users_path(last_id: next_last_id), loading: :lazy

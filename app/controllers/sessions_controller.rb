@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   def create
     user = User.find_or_initialize_by(email: params[:email])
     if user.persisted?
-      user = User.where(id: user.id, encrypted_password: params[:encrypted_password])
+      user = User.find_by(id: user.id, encrypted_password: params[:encrypted_password])
     else
       user.name = params[:email].split("@")[0]
       user.encrypted_password = params[:encrypted_password]

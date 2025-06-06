@@ -1,3 +1,9 @@
 = turbo_frame_tag @room do
-  .vstack.gap-3{ id: dom_id(@room, :messages) }
-    = render collection: @messages.reverse, partial: 'placeholder', as: :message, locals: { room: @room }
+  %div
+    = turbo_frame_tag "messages_#{@last_id}" do
+      - next_last_id = @messages.last&.id
+      - if next_last_id.present? && @viewable_messages.exists?(["messages.id < ?", next_last_id])
+        = turbo_frame_tag "messages_#{next_last_id}", src: room_messages_path(@room, last_id: next_last_id), loading: :lazy
+
+        .vstack.gap-3{ id: @last_id.blank? ? dom_id(@room, :messages) : nil }
+          = render collection: @messages.reverse, partial: 'placeholder', as: :message, locals: { room: @room }
