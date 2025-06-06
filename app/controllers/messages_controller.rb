@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
   after_action :create_message_read, only: %i[show]
 
   def index
-    @messages = @room.viewable_messages_for(current_membership).order(:id) # TODO: paging
+    @messages = @room.viewable_messages_for(current_membership).order(id: :desc).limit(10) # TODO: paging
   end
 
   def show

@@ -1,3 +1,2 @@
-- from_me = message.from == current_membership
-.d-flex{ class: class_names('justify-content-start': !from_me, 'justify-content-end': from_me) }
+%div
   = turbo_frame_tag message, src: room_message_path(room, message)

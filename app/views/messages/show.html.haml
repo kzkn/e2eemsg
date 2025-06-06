@@ -1,34 +1,43 @@
 - from_me = @message.from == current_membership
 
 = turbo_frame_tag @message do
-  .vstack.gap-1.bg-body-tertiary.p-3.rounded{ id: dom_id(@message) }
-    .d-flex.align-items-end.gap-2{ class: class_names('justify-content-end': from_me) }
-      .small.flex-shrink-0.text-end
+  .d-flex{ class: class_names('justify-content-end': from_me) }
+    .vstack.gap-1.bg-body-tertiary.p-3.rounded{ id: dom_id(@message) }
+      .d-flex.align-items-end.gap-2{ class: class_names('justify-content-end': from_me) }
+        - if from_me
+          .small.flex-shrink-0.text-end
+            %div= @message.from.name
+            %div{ id: dom_id(@message, :reads) }
+            = @room.read_count_text(@message, current_membership)
+            %div= l(@message.created_at, format: :short)
+          .flex-nowrap
+            = @message.render_for(current_membership, self)
+        - else
+          .flex-nowrap
+            = @message.render_for(current_membership, self)
+          .small.flex-shrink-0
+            %div= @message.from.name
+            %div{ id: dom_id(@message, :reads) }
+            = @room.read_count_text(@message, current_membership)
+            %div= l(@message.created_at, format: :short)
+      .hstack.gap-2{ class: class_names('justify-content-end': from_me)}
+        .hstack.gap-1{ id: dom_id(@message, :reactions) }
+          = render 'messages/reactions', message: @message
         - unless from_me
-          %div= @message.from.name
-        %div{ id: dom_id(@message, :reads) }
-          = @room.read_count_text(@message, current_membership)
-        %div= l(@message.created_at, format: :short)
-      .flex-nowrap
-        = @message.render_for(current_membership, self)
-    .hstack.gap-2
-      .hstack.gap-1.w-100{ id: dom_id(@message, :reactions), class: class_names('justify-content-end': from_me) }
-        = render 'messages/reactions', message: @message
-      - unless from_me
-        %div{ data: { controller: 'emoji-picker' } }
-          %button.small.bg-white.border-0.rounded-pill.py-1.px-2.text-nowrap{ type: :button, data: { emoji_picker_target: 'button', action: 'emoji-picker#toggle' } }
-            😀+
-          .x-tooltip{ data: { emoji_picker_target: 'tooltip' } }
-            %emoji-picker{ data: { action: 'emoji-click->emoji-picker#pick' } }
-          = form_with url: room_message_reactions_path(@room, @message), method: :post, data: { emoji_picker_target: 'form' } do |f|
-            = f.hidden_field :emoji
-    %details
-      %summary{ class: class_names('text-end': from_me) }
-        返信
-      .mt-1{ data: { controller: 'clear' } }
-        -# TODO: 返信メッセージも暗号化したい
-        = form_with model: ReplyMessage.new, url: room_reply_messages_path, data: { action: 'turbo:submit-end->clear#clearAll' } do |f|
-          = f.hidden_field :reply_to_id, value: @message.id
-          .d-flex.align-items-end.gap-1
-            = f.text_area :body, required: true, data: { clear_target: 'input' }, class: 'form-control'
-            = f.button '返信', class: 'btn btn-sm btn-primary text-nowrap'
+          %div{ data: { controller: 'emoji-picker' } }
+            %button.small.bg-white.border-0.rounded-pill.py-1.px-2.text-nowrap{ type: :button, data: { emoji_picker_target: 'button', action: 'emoji-picker#toggle' } }
+              😀+
+            .x-tooltip{ data: { emoji_picker_target: 'tooltip' } }
+              %emoji-picker{ data: { action: 'emoji-click->emoji-picker#pick' } }
+            = form_with url: room_message_reactions_path(@room, @message), method: :post, data: { emoji_picker_target: 'form' } do |f|
+              = f.hidden_field :emoji
+      %details
+        %summary{ class: class_names('text-end': from_me) }
+          返信
+        .mt-1{ data: { controller: 'clear' } }
+          -# TODO: 返信メッセージも暗号化したい
+          = form_with model: ReplyMessage.new, url: room_reply_messages_path, data: { action: 'turbo:submit-end->clear#clearAll' } do |f|
+            = f.hidden_field :reply_to_id, value: @message.id
+            .d-flex.align-items-end.gap-1
+              = f.text_area :body, required: true, data: { clear_target: 'input' }, class: 'form-control'
+              = f.button '返信', class: 'btn btn-sm btn-primary text-nowrap'

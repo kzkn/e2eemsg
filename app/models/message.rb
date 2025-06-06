@@ -22,6 +22,6 @@ class Message < ApplicationRecord
   end
 
   def broadcast_append
-    broadcast_append_to room, target: dom_id(room), partial: "messages/placeholder", locals: { room:, message: self }
+    broadcast_append_to room, target: dom_id(room, :messages), partial: "messages/placeholder", locals: { room:, message: self }
   end
 end
