@@ -1,10 +1,9 @@
 .container
-  %h1.fs-1
+  %h1.fs-4
     再認証
   .text-secondary
     先に進むにはパスワードの再入力が必要です。
-  %hr
-  %div{ data: { controller: 'authenticate' } }
+  .bg-white.rounded.p-5.mt-3{ data: { controller: 'authenticate' } }
     = form_with url: '#', method: :post, data: { action: 'authenticate#handleSubmit' } do |f|
       = f.hidden_field :email, value: current_user.email, data: { authenticate_target: 'email' }
       .mb-3

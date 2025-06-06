@@ -5,12 +5,12 @@ class Reaction < ApplicationRecord
   belongs_to :from, class_name: "Membership", inverse_of: :sent_reactions
   belongs_to :emoji
 
-  after_commit :broadcast_replace
+  after_commit :broadcast_update
 
   private
 
-  def broadcast_replace
-    broadcast_replace_to message.room, target: dom_id(message, :reactions), partial: "messages/reactions", locals: { message: }
+  def broadcast_update
+    broadcast_update_to message.room, target: dom_id(message, :reactions), partial: "messages/reactions", locals: { message: }
   end
 
   class << self

@@ -1,2 +1,3 @@
 = turbo_frame_tag @room do
-  = render collection: @messages, partial: 'placeholder', as: :message, locals: { room: @room }
+  .vstack.gap-3
+    = render collection: @messages, partial: 'placeholder', as: :message, locals: { room: @room }

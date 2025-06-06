@@ -1,8 +1,7 @@
 - set_sidebar_item :home
 
 .container
-  %h1.fs-1 Rooms
-  %hr
-  .vstack.gap-2
+  %h1.fs-4 Rooms
+  .bg-white.rounded.p-5.mt-3.vstack.gap-2
     - @rooms.each do |room|
       = link_to room.display_name_for(current_user), room_path(room)

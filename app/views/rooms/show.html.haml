@@ -4,21 +4,26 @@
 = turbo_stream_from @room
 = turbo_stream_from current_membership
 
-- other_members = @room.memberships.without(current_membership)
-%details
-  %summary
-    参加しているメンバー
-  .mt-1.vstack.gap-2.py-1.px-3.rounded.bg-body-tertiary
-    - other_members.each do |member|
-      .hstack.gap-3
-        %span= member.name
-        - user = member.user
-        - if current_user.block_by_self?(user)
-          = button_to 'ブロックを解除する', user_block_path(user), method: :delete, class: 'btn btn-link'
-        - else
-          = button_to 'ブロックする', user_block_path(user), method: :post, class: 'btn btn-link'
+.position-absolute.top-0.start-0.end-0.w-100.p-3.bg-body-secondary
+  .d-flex.justify-content-between
+    .fw-bold.fs-5= @room.display_name_for(current_user)
+    %details
+      %summary
+        参加しているメンバー
+      .mt-1.vstack.gap-2.py-1.px-3.rounded.bg-body-tertiary
+        - other_members = @room.memberships.without(current_membership)
+        - other_members.each do |member|
+          .hstack.gap-3
+            %span= member.name
+            - user = member.user
+            - if current_user.block_by_self?(user)
+              = button_to 'ブロックを解除する', user_block_path(user), method: :delete, class: 'btn btn-link'
+            - else
+              = button_to 'ブロックする', user_block_path(user), method: :post, class: 'btn btn-link'
 
-= turbo_frame_tag @room, src: room_messages_path(@room)
+-# TODO: auto scroll to end
+.pt-5{ style: 'height: 100%; overflow-y: auto; padding-bottom: 230px' }
+  = turbo_frame_tag @room, src: room_messages_path(@room)
 
-.position-sticky.bottom-0.bg-white.py-3{ style: 'z-index: 1' }
+.position-absolute.bottom-0.start-0.end-0.w-100.p-3.bg-white
   = render 'rooms/message_form', room: @room

@@ -1,8 +1,8 @@
 .container
-  %h1.fs-1
+  %h1.fs-4
     認証
   %hr
-  %div{ data: { controller: 'authenticate' } }
+  .bg-white.rounded.p-5.mt-3{ data: { controller: 'authenticate' } }
     = form_with url: '#', method: :post, data: { action: 'authenticate#handleSubmit' } do |f|
       .mb-3
         = f.email_field :email, placeholder: 'メールアドレス', data: { authenticate_target: 'email' }, class: 'form-control'
