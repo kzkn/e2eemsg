@@ -2,6 +2,8 @@ Rails.application.routes.draw do
   root to: "rooms#index"
   resource :session, only: %i[new create edit update destroy]
 
+  resources :users, only: %i[index show]
+
   resources :rooms, only: %i[index show] do
     resources :messages, only: %i[index show] do
       resources :reactions, only: %i[create]

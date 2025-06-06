@@ -1,0 +1,7 @@
+- set_sidebar_item :user
+
+.container
+  %h1.fs-4 Users
+  .bg-white.rounded.p-5.mt-3.vstack.gap-2
+    - @users.each do |user|
+      = link_to user.name, user_path(user)

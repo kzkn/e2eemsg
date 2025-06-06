@@ -22,8 +22,8 @@ class OneToOneChat < ApplicationRecord
   end
 
   def create_memberships
-    smaller_user.memberships.create_or_find_by!(room:)
-    larger_user.memberships.create_or_find_by!(room:)
+    room.memberships.build(user: smaller_user)
+    room.memberships.build(user: larger_user)
   end
 
   def other_for(user)
@@ -31,6 +31,20 @@ class OneToOneChat < ApplicationRecord
       larger_user
     else
       smaller_user
+    end
+  end
+
+  class << self
+    def find_or_create_for_users(user1, user2)
+      smaller, larger = user1.id < user2.id ? [user1, user2] : [user2, user1]
+      chat = find_by(smaller_user: smaller, larger_user: larger)
+      return chat if chat.present?
+
+      room = Room.new
+      chat = OneToOneChat.new(room:, smaller_user: smaller, larger_user: larger)
+      room.joinable = chat
+      room.save!
+      chat
     end
   end
 end
