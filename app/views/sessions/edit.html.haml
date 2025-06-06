@@ -8,7 +8,7 @@
     = form_with url: '#', method: :post, data: { action: 'authenticate#handleSubmit' } do |f|
       = f.hidden_field :email, value: current_user.email, data: { authenticate_target: 'email' }
       .mb-3
-        = f.password_field :password, placeholder: 'パスワード', data: { authenticate_target: 'password' }, class: 'form-control'
+        = f.password_field :password, placeholder: 'パスワード', data: { authenticate_target: 'password' }, class: 'form-control', autofocus: true
       = f.button '再認証', class: 'btn btn-primary'
   
     = form_with url: session_path, method: :put, data: { authenticate_target: 'form' } do |f|

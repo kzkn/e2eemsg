@@ -1,0 +1,17 @@
+.d-flex.flex-nowrap
+  .d-flex.flex-column.flex-shrink-0{ style: 'width: 150px' }
+    %ul.nav.nav-pills.flex-column
+      - current_user.owned_stamp_sets.order(:id).each_with_index do |stamp_set, index|
+        %li.nav-item
+          = link_to stamp_set.name, 'javascript:void(0)', class: class_names('nav-link', active: index == 0),
+                                                          data: { bs_toggle: 'tab', bs_target: dom_id(stamp_set, :form) }
+  .tab-content.p-3
+    - current_user.owned_stamp_sets.order(:id).each_with_index do |stamp_set, index|
+      .tab-pane{ id: dom_id(stamp_set, :form), class: class_names('show active': index == 0) }
+        .row
+          - stamp_set.stamps.order(:id).each do |stamp|
+            .col
+              = form_with model: StampMessage.new, url: room_stamp_messages_path(room) do |f|
+                = f.hidden_field :stamp_id, value: stamp.id
+                = f.button class: 'block bg-transparent border-0', style: 'width: 75px; height: 75px;' do
+                  = image_tag stamp.image, class: 'w-100 h-auto object-fit-contain'

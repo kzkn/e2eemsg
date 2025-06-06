@@ -1,0 +1,26 @@
+%ul.nav.nav-tabs
+  %li.nav-item
+    %button.nav-link.active{ data: { bs_toggle: 'tab', bs_target: '#message-form-text' } }
+      Text
+  %li.nav-item
+    %button.nav-link{ data: { bs_toggle: 'tab', bs_target: '#message-form-stamp' } }
+      Stamp
+  %li.nav-item
+    %button.nav-link{ data: { bs_toggle: 'tab', bs_target: '#message-form-image' } }
+      Image
+  %li.nav-item
+    %button.nav-link{ data: { bs_toggle: 'tab', bs_target: '#message-form-video' } }
+      Video
+
+.tab-content.py-3
+  .tab-pane.show.active#message-form-text
+    = render 'text_message_form', room: room
+
+  .tab-pane#message-form-stamp
+    = render 'stamp_message_form', room: room
+
+  .tab-pane#message-form-image
+    = render 'image_message_form', room: room
+
+  .tab-pane#message-form-video
+    = render 'video_message_form', room: room
